@@ -9,6 +9,8 @@ let logFile = null;
 try{
   if (fs.existsSync(logPath)) {
     logFile = fs.readFileSync(logPath);
+  } else {
+    console.log(`no file found at: ${logPath}, logFile will be null...`);
   }
 } catch (err) {
   console.log(`failed to read data file: ${err}`);
@@ -30,6 +32,7 @@ app.get('/', (request, response) => {
 
     try {
       fs.writeFileSync(logPath, JSON.stringify(visitors));
+      console.log("Wrote updates to log file");
     } catch (err) {
       console.log(`failed to write to data file: ${err}`);
     }
@@ -37,7 +40,7 @@ app.get('/', (request, response) => {
 
   let entries = Object.entries(visitors);
 
-  // do not do this in the wild
+  // do not do this in the wild, use a template engine or something instead
   response.send(`
     <html>
       <body>

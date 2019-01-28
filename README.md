@@ -67,13 +67,10 @@ This will start the builder which will start the specified base image, and incre
 
 After the image has been built, we can check it out using `docker images`. This will show you information like how recently the image was built and the size of the image.
 
-Additionally, you can use `docker history <image_name>` to have a look at the layer sizes for this image. If you run that with the image we just built here, you will be able to see the size of the layer created by running `npm install`.
+Additionally, you can use `docker history <image_name>` to have a look at the layer sizes for this image. If you run that with the image we just built here, you will be able to see the size of the layer created by running `npm install`, which installed all the dependencies required by our app.
 
 ## J - Pushing the Docker Image
 Push the image to DockerHub, which is an online registry for sharing docker images (similar to a github for git). We can do this using the command `docker push <container_name>`. Notice how this pushes different layers at a time. However, before we do this, we have to make sure our image follows the naming convention: `<docker_username>/<name>`. If your image does not have this name, simply rebuild it with the new name (notice how quickly Docker can do this since it has all the layers cached locally).
 
 ## K - Starting a Container using our new Docker Image
-We can start a container from our new image using  `docker run -p <host_port>:8080 <container_name> &`. While we could have done this before pushing since we built the image locally, since we pushed, we can now start this container from anywhere (try pulling down your neighbors image!). 
-
-Also, notice the ampersand at the end of this command. This is just a shortcut to suppress the output from the container. We would do something more polished if we were running this in a production setting.
-
+We can start a container from our new image using  `docker run -d -p <host_port>:8080 <container_name>`. While we could have done this before pushing since we built the image locally, since we pushed, we can now start this container from anywhere (try pulling down your neighbors image!). 
