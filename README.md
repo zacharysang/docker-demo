@@ -67,6 +67,8 @@ This will start the builder which will start the specified base image, and incre
 
 After the image has been built, we can check it out using `docker images`. This will show you information like how recently the image was built and the size of the image.
 
+Additionally, you can use `docker history <image_name>` to have a look at the layer sizes for this image. If you run that with the image we just built here, you will be able to see the size of the layer created by running `npm install`.
+
 ## J - Pushing the Docker Image
 Push the image to DockerHub, which is an online registry for sharing docker images (similar to a github for git). We can do this using the command `docker push <container_name>`. Notice how this pushes different layers at a time. However, before we do this, we have to make sure our image follows the naming convention: `<docker_username>/<name>`. If your image does not have this name, simply rebuild it with the new name (notice how quickly Docker can do this since it has all the layers cached locally).
 
