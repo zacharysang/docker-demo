@@ -1,8 +1,20 @@
+const fs = require('fs');
 const express = require('express');
+
 const app = express();
 const port = 8080;
+const logPath = '/root/data/saved_visitors.json';
 
-let visitors = {};
+let logFile = null;
+try{
+  if (fs.existsSync(logPath)) {
+    logFile = fs.readFileSync(logPath);
+  }
+} catch (err) {
+  console.log(`failed to read data file: ${err}`);
+}
+
+let visitors = logFile ? JSON.parse(logFile) : {};
 
 app.get('/', (request, response) => {
 
@@ -16,6 +28,11 @@ app.get('/', (request, response) => {
       visitors[visitor] = 1;
     }
 
+    try {
+      fs.writeFileSync(logPath, JSON.stringify(visitors));
+    } catch (err) {
+      console.log(`failed to write to data file: ${err}`);
+    }
   }
 
   let entries = Object.entries(visitors);
