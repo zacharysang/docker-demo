@@ -31,7 +31,7 @@ Now let's dettach from our ubuntu container again and then remove it using `dock
 # Making a new Docker Image
 ## Create a Dockerfile
 For this demo, we will make a new image using this Dockerfile:
-`
+```
 FROM node
 
 # Copy in our node app
@@ -48,7 +48,7 @@ CMD npm start
 
 # Make port 8080 available to the host
 EXPOSE 8080
-`
+```
 
 See below for some of the other things a Dockerfile can typically do (or see [here](https://docs.docker.com/engine/reference/builder/) for an official reference):
 * `COPY <src> <dest>` - copy files or directories at `<src>` (relative to our Dockerfile ) to `<dest>` (inside our container)
