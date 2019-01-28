@@ -1,0 +1,14 @@
+{
+  "name": "docker-demo",
+  "version": "1.0.0",
+  "description": "A basic guestbook app as a part of a docker demo",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
