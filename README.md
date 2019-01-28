@@ -61,7 +61,7 @@ See below for some of the other things a Dockerfile can typically do (or see [he
 
 
 ## Building the Docker Image
-Once we have our Dockerfile sorted, we can build it into an image using the command: `docker build -t <dockerhub_username>/<image_name> <Dockerfile_path (usually just '.')>`
+Once we have our Dockerfile sorted, we can build it into an image using the command: `docker build -t <dockerhub_username>/<image_name> <Dockerfile_path (this is usually just '.' if we're building in the same directory as Dockerfile)>`
 
 This will start the builder which will start the specified base image, and incrementally run each command in your Dockerfile. With some exceptions such as `WORKDIR`, `ENV`, each command (eg: `RUN`, `COPY`, `ADD`) will add a new layer to our layered filesystem (more on this later).
 
@@ -71,5 +71,7 @@ After the image has been built, we can check it out using `docker images`. This 
 Push the image to DockerHub, which is an online registry for sharing docker images (similar to a github for git). We can do this using the command `docker push <container_name>`. Notice how this pushes different layers at a time. However, before we do this, we have to make sure our image follows the naming convention: `<docker_username>/<name>`. If your image does not have this name, simply rebuild it with the new name (notice how quickly Docker can do this since it has all the layers cached locally).
 
 ## Starting a Container using our new Docker Image
-We can start a container from our new image using  `docker run -p <host_port>:8080 <container_name> &`. While we could have done this before pushing since we built the image locally, since we pushed, we can now start this container from anywhere (try pulling down your neighbors image!). Also, notice the ampersand at the end of this command. This is just a shortcut to suppress the output from the container. We would do something more polished if we were running this in a production setting.
+We can start a container from our new image using  `docker run -p <host_port>:8080 <container_name> &`. While we could have done this before pushing since we built the image locally, since we pushed, we can now start this container from anywhere (try pulling down your neighbors image!). 
+
+Also, notice the ampersand at the end of this command. This is just a shortcut to suppress the output from the container. We would do something more polished if we were running this in a production setting.
 
