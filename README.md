@@ -64,7 +64,7 @@ In general, below are some of the other things a Dockerfile can typically do (or
 * `ENV <key> <val>` - declare an environment variable
 * `USER` - declare the user to log into when attaching to the container (must be an existing user)
 * `WORKDIR` - declare the directory to start in when attaching to the container
-* `EXPOSE` - expose a port (not too important)
+* `EXPOSE` - expose a port to the host container
 
 
 ## I - Building the Docker Image
