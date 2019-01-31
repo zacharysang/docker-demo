@@ -29,10 +29,14 @@ Now let's dettach from our ubuntu container again and then remove it using `dock
 
 
 # Making a new Docker Image
+Before getting started on this section, head over to [DockerHub](http://dockerhub.com) to make an account. This is very similar to GitHub, but is centered around sharing Docker images rather than Git projects. Dockerhub serves as a 'registry' which is used to push/pull docker images to/from.
+
 ## H - Create a Dockerfile
+To save some time, the files needed for what we are about to do can be downloaded by cloning [this repo](https://github.com/zacharysang/docker-demo.git)
+
 For this demo, we will make a new image using this Dockerfile:
 ```
-FROM node
+FROM node:alpine
 
 # Copy in our node app
 COPY guestbook_app /root/guestbook_app
@@ -46,11 +50,14 @@ RUN npm install
 # Make this an executable and specify the entrypoint
 CMD npm start
 
+# Declare mount point to save guestbook data to
+VOLUME ["/root/data"]
+
 # Make port 8080 available to the host
-EXPOSE 8080
+EXPOSE 8080  
 ```
 
-See below for some of the other things a Dockerfile can typically do (or see [here](https://docs.docker.com/engine/reference/builder/) for an official reference):
+In general, below are some of the other things a Dockerfile can typically do (or see [here](https://docs.docker.com/engine/reference/builder/) for an official reference):
 * `COPY <src> <dest>` - copy files or directories at `<src>` (relative to our Dockerfile ) to `<dest>` (inside our container)
 * `ADD <src> <dest>` - like copy, but `<src>` can also be a url or link to some remote resource
 * `RUN <command>` - run a command inside the container. The changes to the filesystem will be preserved. An example of this would be doing something like: `apt install nodejs`, which will make node available in our new image.
@@ -61,16 +68,27 @@ See below for some of the other things a Dockerfile can typically do (or see [he
 
 
 ## I - Building the Docker Image
-Once we have our Dockerfile sorted, we can build it into an image using the command: `docker build -t <dockerhub_username>/<image_name> <Dockerfile_path (this is usually just '.' if we're building in the same directory as Dockerfile)>`
+Once we have these files downloaded, which includes our `Dockerfile`, we can build it into an image using the command: `docker build -t <dockerhub_username>/<image_name> <Dockerfile_path>`. Where `Dockerfile_path` is usually just '.' if we're building in the same directory as Dockerfile.
 
-This will start the builder which will start the specified base image, and incrementally run each command in your Dockerfile. With some exceptions such as `WORKDIR`, `ENV`, each command (eg: `RUN`, `COPY`, `ADD`) will add a new layer to our layered filesystem (more on this later).
+This will start the builder which will start the specified base image, and incrementally run each command in your Dockerfile. With some exceptions such as `WORKDIR`, `ENV`, each command (eg: `RUN`, `COPY`, `ADD`) will add a new layer to our layered filesystem.
 
 After the image has been built, we can check it out using `docker images`. This will show you information like how recently the image was built and the size of the image.
 
-Additionally, you can use `docker history <image_name>` to have a look at the layer sizes for this image. If you run that with the image we just built here, you will be able to see the size of the layer created by running `npm install`, which installed all the dependencies required by our app.
+Additionally, you can use `dodcker history <image_name>` to have a look at the layer sizes for this image. If you run that with the image we just built here, you will be able to see the size of the layer created by running `npm install`, which installed all the dependencies required by our app.
+
+(Optional) To maximize portability and boot time, we usually try to keep our Docker images small. Alpine linux is a base image that is often used with Docker images. It is really barebones which helps it to produce tiny images. In our Dockerfile try editing the first line from `FROM node` to `FROM node:alpine`. Here was have added a 'tag' which will use a different image from before (`:latest` is the default tag). Rebuild after this change and check out how much smaller your image is using `docker images`!
 
 ## J - Pushing the Docker Image
-Push the image to DockerHub, which is an online registry for sharing docker images (similar to a github for git). We can do this using the command `docker push <container_name>`. Notice how this pushes different layers at a time. However, before we do this, we have to make sure our image follows the naming convention: `<docker_username>/<name>`. If your image does not have this name, simply rebuild it with the new name (notice how quickly Docker can do this since it has all the layers cached locally).
+Push the image to DockerHub, which is an online registry for sharing docker images (similar to a github for git). We can do this using the command `docker push <dockerhub_username>/<container_name>`. Notice how this pushes different layers at a time.
 
 ## K - Starting a Container using our new Docker Image
-We can start a container from our new image using  `docker run -d -p <host_port>:8080 <container_name>`. While we could have done this before pushing since we built the image locally, since we pushed, we can now start this container from anywhere (try pulling down your neighbors image!). 
+We can start a container from our new image using  `docker run -d -p 8080:8080 <container_name>`. This will run our container as a daemon (-d), and map the host port 8080 to the container's port 8080 (`-p 8080:8080`). While we could have done this before pushing since we built the image locally, since we pushed, we can now start this container from anywhere (try pulling down your neighbors image!). 
+
+Since our container is running, we will be able to check out the web preview by selecting the `Web Preview` button on the console and selecting `Preview on port 8080`. Here we can see our guestbook, log entries, and see how many other people have signed.
+
+## L - Incorporating volumes
+Currently, if we stop and start a new docker container using this image, the memory of past guests will be lost. This is because our container is stateless, which is good since we wouldn't want other people to get the guestbook history if they are starting up the guestbook container themselves using this image.
+
+Having said this, we would like to save this data ourselves so that we can reload it after upgrading containers (requiring moving data to the upgraded container), or if we want to move this data between containers. It turns out that our guestbook app is already set up to write the guestbook data to the container's disk under `/root/data` on each new guest. We can use Docker Volumes to keep this data by simply adding `-v my-volume:/root/data` to the command in the previous step (K). This declares that we are mounting a volume `my-volume` to the directory `/root/data` within the container (if there isn't already a volume with this name, Docker will create a new blank one for us). Because of this mounting, all files that are written to anything under this directory will be saved to the volume, and when starting the container, the contents of the volume will be made available at this location.
+
+So now we can try to start our container again with our updated command. We can populate the guestbook with some data, stop the container, start a new one, and still see our data!
