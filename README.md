@@ -36,7 +36,7 @@ To save some time, the files needed for what we are about to do can be downloade
 
 For this demo, we will make a new image using this Dockerfile:
 ```
-FROM node:alpine
+FROM node
 
 # Copy in our node app
 COPY guestbook_app /root/guestbook_app
